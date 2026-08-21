@@ -1,23 +1,18 @@
-import os
-from langchain_openai import ChatOpenAI
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from app.tools import search_products, add_to_cart, view_cart
 
+class MockAgentExecutor:
+    def invoke(self, inputs: dict) -> dict:
+        user_text = inputs.get("input", "").lower()
+
+        if "search" in user_text or "find" in user_text:
+            results = search_products.invoke({"query": ""})
+            return {"output": f"Found items: {results}"}
+        
+        elif "cart" in user_text:
+            items = view_cart.invoke({})
+            return {"output": f"Your current cart: {items}"}
+            
+        return {"output": "Mock Agent: I can help you search products or view your cart. (No API key needed!)"}
+
 def build_commerce_agent():
-    tools = [search_products, add_to_cart, view_cart]
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.2,
-        api_key=os.getenv("OPENAI_API_KEY")
-    )
-    
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an autonomous shopping assistant. Assist users in finding items, managing their cart, and proceeding to checkout. Always confirm actions with the user."),
-        MessagesPlaceholder(variable_name="chat_history"),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
-    
-    agent = create_tool_calling_agent(llm, tools, prompt)
-    return AgentExecutor(agent=agent, tools=tools, verbose=True)
+    return MockAgentExecutor()
