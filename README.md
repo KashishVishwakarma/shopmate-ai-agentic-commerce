@@ -38,11 +38,15 @@ cd ai-commerce-agent
 2.Create and activate a virtual environment:
 
 Linux/macOS:
+--
 python3 -m venv venv
 source venv/bin/activate
+
 Windows:
+--
 python -m venv venv
 venv\Scripts\activate
+
 Cloud-Ready: Pre-configured deployment scripts for platforms like Render using ASGI/Uvicorn
 
 Live 
