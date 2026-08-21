@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopAI — Agentic Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Navigation / Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">ShopAI</span>
+      </div>
+      <div id="nav-user" class="flex items-center space-x-4 text-sm">
+        <span id="user-display" class="hidden text-slate-400"></span>
+        <button id="auth-btn" onclick="toggleAuthModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-4 py-1.5 rounded-lg transition">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero & Split Layout -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left: Catalog Showcase -->
+    <section class="lg:col-span-2 space-y-6">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">AI-Powered Commerce</h1>
+        <p class="text-slate-400 text-sm mt-1">Chat directly with the autonomous agent to search products and build your cart.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition">
+          <div class="h-32 bg-slate-800/60 rounded-lg flex items-center justify-center text-3xl">🎧</div>
+          <h3 class="font-semibold mt-3 text-slate-200">Noise-Canceling Headphones</h3>
+          <p class="text-xs text-slate-400 mt-1">High-fidelity audio with active noise reduction.</p>
+          <div class="mt-3 flex justify-between items-center">
+            <span class="text-emerald-400 font-bold">$149.99</span>
+            <button onclick="sendQuickPrompt('Search headphones')" class="text-xs border border-slate-700 px-2.5 py-1 rounded-md hover:bg-slate-800 text-slate-300">Ask AI</button>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition">
+          <div class="h-32 bg-slate-800/60 rounded-lg flex items-center justify-center text-3xl">⌨️</div>
+          <h3 class="font-semibold mt-3 text-slate-200">Mechanical Keyboard</h3>
+          <p class="text-xs text-slate-400 mt-1">Hot-swappable RGB backlit custom switches.</p>
+          <div class="mt-3 flex justify-between items-center">
+            <span class="text-emerald-400 font-bold">$89.99</span>
+            <button onclick="sendQuickPrompt('Search mechanical keyboard')" class="text-xs border border-slate-700 px-2.5 py-1 rounded-md hover:bg-slate-800 text-slate-300">Ask AI</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Agent Chat Interface -->
+    <section class="flex flex-col h-[580px] bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <h2 class="font-semibold text-sm text-slate-200">Commerce Assistant</h2>
+        </div>
+        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">Online</span>
+      </div>
+
+      <!-- Messages Feed -->
+      <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm">
+        <div class="bg-slate-800/60 text-slate-300 p-3 rounded-xl rounded-tl-none border border-slate-700/50 max-w-[85%]">
+          Hello! I am your AI shopping agent. You can ask me to search products, check specs, or view your current cart.
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="p-3 border-t border-slate-800 bg-slate-900/60">
+        <form id="chat-form" onsubmit="handleChat(event)" class="flex gap-2">
+          <input id="chat-input" type="text" placeholder="Type: 'find headphones' or 'view cart'..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500" required />
+          <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition">Send</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login / Register Modal -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 relative">
+      <button onclick="toggleAuthModal()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-300">✕</button>
+      <h2 class="text-xl font-bold text-slate-100">Welcome Back</h2>
+      <p class="text-xs text-slate-400 mt-1">Sign in to sync your cart and order history.</p>
+
+      <form onsubmit="handleLogin(event)" class="mt-5 space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Email</label>
+          <input id="login-email" type="email" required placeholder="you@example.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Password</label>
+          <input type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+        </div>
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2 rounded-lg text-sm transition">Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    function toggleAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      currentUser = email.split('@')[0];
+      
+      document.getElementById('user-display').textContent = `Hi, ${currentUser}`;
+      document.getElementById('user-display').classList.remove('hidden');
+      document.getElementById('auth-btn').textContent = 'Sign Out';
+      document.getElementById('auth-btn').onclick = handleSignOut;
+      toggleAuthModal();
+    }
+
+    function handleSignOut() {
+      currentUser = null;
+      document.getElementById('user-display').classList.add('hidden');
+      document.getElementById('auth-btn').textContent = 'Sign In';
+      document.getElementById('auth-btn').onclick = toggleAuthModal;
+    }
+
+    function sendQuickPrompt(text) {
+      document.getElementById('chat-input').value = text;
+      document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+    }
+
+    async function handleChat(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const chatBox = document.getElementById('chat-box');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Render user message
+      chatBox.innerHTML += `
+        <div class="flex justify-end">
+          <div class="bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 p-3 rounded-xl rounded-tr-none max-w-[85%]">${text}</div>
+        </div>`;
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Loading state
+      const loaderId = 'loader-' + Date.now();
+      chatBox.innerHTML += `
+        <div id="${loaderId}" class="bg-slate-800/40 text-slate-400 p-3 rounded-xl rounded-tl-none border border-slate-800 text-xs italic">
+          Thinking...
+        </div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, session_id: currentUser || 'guest' })
+        });
+        const data = await res.json();
+        
+        document.getElementById(loaderId).remove();
+        chatBox.innerHTML += `
+          <div class="bg-slate-800/60 text-slate-300 p-3 rounded-xl rounded-tl-none border border-slate-700/50 max-w-[85%]">
+            ${data.response || 'No response returned.'}
+          </div>`;
+      } catch (err) {
+        document.getElementById(loaderId).remove();
+        chatBox.innerHTML += `
+          <div class="bg-rose-900/40 text-rose-300 p-3 rounded-xl border border-rose-800/50 text-xs">
+            Failed to connect to agent.
+          </div>`;
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
