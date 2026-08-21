@@ -1,21 +1,30 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
-from app.models import ChatRequest, ChatResponse
-from app.database import init_db
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from app.agent import build_commerce_agent
+from app.database import init_db
+from app.models import ChatRequest, ChatResponse
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Runs when the server boots up (creates tables & seeds catalog)
     init_db()
     yield
 
+
 app = FastAPI(title="AI Agentic Commerce API", lifespan=lifespan)
+
+# Mount static files folder
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 agent_executor = build_commerce_agent()
 
+
 @app.get("/")
-def health_check():
-    return {"status": "ok", "service": "Agentic Commerce API"}
+def serve_home():
+    return FileResponse("static/index.html")
+
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -30,4 +39,3 @@ async def chat(request: ChatRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
