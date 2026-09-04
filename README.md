@@ -51,6 +51,6 @@ Cloud-Ready: Pre-configured deployment scripts for platforms like Render using A
 
 Live 
 ---
-Frontend -> https://shopmate-ai-agentic-commerce.onrender.com
+Frontend -> https://shopmate-ai-agentic-commerce-1.onrender.com
 
-Backend ->  https://shopmate-ai-agentic-commerce.onrender.com/docs
+Backend ->  https://shopmate-ai-agentic-commerce-1.onrender.com/docs
